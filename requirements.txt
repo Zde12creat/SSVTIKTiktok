@@ -1,11 +1,7 @@
 Flask
-Flask-Cors
-yt-dlp
+Flask-CORS
+Flask-Limiter
 requests
-gevent
-gunicorn
 mutagen
-flask-limiter
-instaloader
-facebook-scraper
-lxml_html_clean
+gunicorn
+gevent
