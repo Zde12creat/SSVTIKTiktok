@@ -8,4 +8,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "vinder.py"]
+# Ganti vinder.py menjadi svetiktok.py sesuai nama file aslimu
+CMD ["python", "svetiktok.py"]
