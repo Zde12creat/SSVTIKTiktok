@@ -1,3 +1,4 @@
+
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
@@ -8,5 +9,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-# Ganti vinder.py menjadi svetiktok.py sesuai nama file aslimu
+# Solusi bypass: Langsung panggil python untuk eksekusi server utama
 CMD ["python", "svetiktok.py"]
