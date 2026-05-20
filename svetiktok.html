@@ -555,6 +555,60 @@
       .features-grid { grid-template-columns: 1fr; }
     }
 
+    /* ===== BATCH DOWNLOAD BUTTON ===== */
+    #btn-batch-dl {
+      display: none;
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0d1f2a 0%, #1a0d1f 100%);
+      border: 1px solid transparent;
+      background-clip: padding-box;
+      color: var(--text);
+      box-shadow: 0 4px 20px -2px rgba(254, 9, 121, 0.25), 0 4px 20px -2px rgba(0, 242, 254, 0.25);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #btn-batch-dl::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--cyan), var(--pink));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    #btn-batch-dl:hover {
+      background: linear-gradient(135deg, #0f2535 0%, #250f25 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px -2px rgba(254, 9, 121, 0.35), 0 8px 28px -2px rgba(0, 242, 254, 0.35);
+    }
+    #btn-batch-dl:active {
+      transform: translateY(0px);
+    }
+    #btn-batch-dl .batch-label {
+      background: linear-gradient(135deg, var(--cyan), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+    }
+    #btn-batch-dl.batch-running {
+      opacity: 0.7;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
   </style>
 </head>
 <body>
@@ -625,6 +679,11 @@
       </div>
 
       <button class="btn-primary" id="btn-search" onclick="doSearch()">Cari Sekarang</button>
+
+      <!-- ===== BATCH DOWNLOAD BUTTON ===== -->
+      <button id="btn-batch-dl" onclick="triggerDownloadAll()">
+        <span class="batch-label">⚡ Download All Video (Batch)</span>
+      </button>
 
       <!-- ===== LOADING SPINNER ===== -->
       <div id="search-loading">
@@ -725,7 +784,10 @@
   const resSelected = { Search: 'HYPE v1.3', Url: 'HYPE v1.3' };
   let lastUrl = '';
   let currentPreviewData = null;
-  let selectedFormat = 'mp4'; 
+  let selectedFormat = 'mp4';
+
+  /* ===== BATCH DOWNLOAD: GLOBAL STATE ===== */
+  let currentSearchResults = [];
 
   /* ===== CLEAR BUTTON LOGIC ===== */
   function toggleClear(inputId, clearBtnId) {
@@ -956,7 +1018,15 @@
       status.textContent = videos.length > 0 ? `${videos.length} video TikTok ditemukan` : 'Tidak ada hasil untuk kata kunci ini.';
       status.className = videos.length > 0 ? 'status-txt ok' : 'status-txt';
 
+      // ===== BATCH: Populate currentSearchResults =====
+      currentSearchResults = [];
+      const batchBtn = document.getElementById('btn-batch-dl');
+
       videos.forEach(v => {
+        // Simpan data video ke array global untuk batch download
+        const videoUrl = `/api/get_video?url=${encodeURIComponent(resSelected['Search']==='HYPE v1.3'?v.hdplay:v.play)}&title=${encodeURIComponent(v.title)}`;
+        currentSearchResults.push({ url: videoUrl, title: v.title });
+
         const d = document.createElement('div'); d.className = 'video-item';
         const previewUrl = v.hdplay || v.play || '';
         d.innerHTML = `
@@ -969,15 +1039,49 @@
           </div>`;
         resEl.appendChild(d);
       });
+
+      // Tampilkan/sembunyikan tombol batch sesuai jumlah hasil
+      if (videos.length > 0) {
+        batchBtn.style.display = 'block';
+      } else {
+        batchBtn.style.display = 'none';
+      }
     } catch(e) {
       status.textContent = 'Error: ' + e.message;
       status.className = 'status-txt err';
+      // Sembunyikan tombol batch jika terjadi error
+      document.getElementById('btn-batch-dl').style.display = 'none';
+      currentSearchResults = [];
     } finally {
       // Selalu sembunyikan spinner di akhir
       loadingEl.classList.remove('active');
       btn.disabled = false;
       btn.textContent = 'Cari Sekarang';
     }
+  }
+
+  /* ===== BATCH DOWNLOAD: triggerDownloadAll ===== */
+  function triggerDownloadAll() {
+    if (!currentSearchResults || currentSearchResults.length === 0) return;
+
+    const batchBtn = document.getElementById('btn-batch-dl');
+    batchBtn.classList.add('batch-running');
+    batchBtn.querySelector('.batch-label').textContent = `⏳ Memproses ${currentSearchResults.length} video...`;
+
+    // Loop semua video dengan jeda 600ms per video (anti popup-blocker)
+    currentSearchResults.forEach((video, index) => {
+      setTimeout(() => {
+        handleRealDownload(video.url, video.title);
+
+        // Setelah video terakhir, kembalikan tombol ke normal
+        if (index === currentSearchResults.length - 1) {
+          setTimeout(() => {
+            batchBtn.classList.remove('batch-running');
+            batchBtn.querySelector('.batch-label').textContent = `⚡ Download All Video (Batch)`;
+          }, 1500);
+        }
+      }, index * 600);
+    });
   }
 
   /* ===== DOWNLOAD URL ===== */
