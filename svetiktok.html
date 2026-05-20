@@ -159,47 +159,6 @@
       border-color: var(--cyan); color: var(--cyan); background: #0d1f2a; transform: translateY(-1px);
     }
 
-    /* ===== BATCH DOWNLOAD BUTTON ===== */
-    #btn-download-all,
-    .batch-download-btn {
-      display: inline-block;
-      width: auto;
-      margin-top: 0;
-      background: linear-gradient(135deg, rgba(0,242,254,0.08), rgba(254,9,121,0.08));
-      border: 1px solid transparent;
-      background-clip: padding-box;
-      -webkit-background-clip: padding-box;
-      border-radius: 14px;
-      color: var(--cyan);
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 0.3px;
-      box-shadow: 0 0 0 1px rgba(0,242,254,0.35), 0 4px 20px rgba(0,242,254,0.08), 0 4px 20px rgba(254,9,121,0.06);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    #btn-download-all::before,
-    .batch-download-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(0,242,254,0.0), rgba(254,9,121,0.0));
-      transition: background 0.3s ease;
-      border-radius: 14px;
-    }
-    #btn-download-all:hover,
-    .batch-download-btn:hover {
-      background: linear-gradient(135deg, rgba(0,242,254,0.16), rgba(254,9,121,0.16));
-      box-shadow: 0 0 0 1px rgba(0,242,254,0.6), 0 8px 28px rgba(0,242,254,0.15), 0 4px 20px rgba(254,9,121,0.12);
-      transform: translateY(-2px);
-      color: #fff;
-    }
-    #btn-download-all:active,
-    .batch-download-btn:active {
-      transform: translateY(0px);
-    }
-
     /* ===== FORMAT TOGGLE ===== */
     .format-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
     .fmt-btn {
@@ -405,6 +364,114 @@
     
     .dl-close { background: none; border: none; color: var(--muted); padding: 4px; cursor: pointer; width: auto; font-size: 16px; }
     .dl-close:hover { color: var(--text); }
+
+    /* ===== DOWNLOAD ALL BUTTON ===== */
+    #btn-download-all {
+      display: none;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 14px;
+      background: linear-gradient(135deg, var(--cyan), var(--pink));
+      color: #0f172a;
+      box-shadow: 0 4px 20px rgba(0,242,254,0.25), 0 4px 20px rgba(254,9,121,0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.3px;
+      position: relative;
+      overflow: hidden;
+    }
+    #btn-download-all::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--pink), var(--cyan));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #btn-download-all::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: none;
+    }
+    #btn-download-all.downloading::after {
+      animation: btnShimmer 1.4s ease-in-out infinite;
+    }
+    @keyframes btnShimmer {
+      0% { left: -100%; }
+      100% { left: 160%; }
+    }
+    #btn-download-all:hover::before { opacity: 1; }
+    #btn-download-all:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,242,254,0.3), 0 8px 28px rgba(254,9,121,0.2); }
+    #btn-download-all:disabled { background: #2a2a35; color: #4a5568; cursor: not-allowed; box-shadow: none; transform: none; }
+    #btn-download-all span { position: relative; z-index: 1; }
+
+    /* ===== DOWNLOAD ALL PROGRESS PANEL ===== */
+    .dl-all-progress {
+      margin-top: 12px;
+      background: rgba(0,242,254,0.04);
+      border: 1px solid rgba(0,242,254,0.15);
+      border-radius: 14px;
+      overflow: hidden;
+      display: none;
+    }
+    .dl-all-progress.active { display: block; animation: fadeInSpinner 0.3s ease; }
+
+    .dl-all-progress-header {
+      padding: 12px 14px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .dl-all-progress-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+    .dl-all-progress-counter {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text);
+      background: #1a1a22;
+      padding: 3px 9px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .dl-all-bar-wrap {
+      height: 5px;
+      background: #2a2a35;
+      margin: 0 14px 14px;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .dl-all-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--cyan), var(--pink));
+      width: 0%;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .dl-all-video-name {
+      padding: 0 14px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     /* ===== FEATURES ===== */
     .features-section { padding: 40px 16px 0; max-width: 640px; margin: 0 auto; }
@@ -675,12 +742,19 @@
 
       <div class="status-txt" id="search-status"></div>
       <div id="results"></div>
-    </div>
-
-    <div class="batch-btn-wrapper" style="text-align: center; margin: 20px 0; display: none;" id="batch-wrapper">
-      <button id="btn-download-all" class="batch-download-btn" onclick="triggerDownloadAll()" style="padding: 12px 24px; font-weight: bold; cursor: pointer;">
-        <span>⚡ Download All Video (Batch)</span>
+      <button id="btn-download-all" onclick="downloadAll()">
+        <span id="btn-download-all-label">⬇ Download Semua Video</span>
       </button>
+      <div class="dl-all-progress" id="dl-all-progress">
+        <div class="dl-all-progress-header">
+          <span class="dl-all-progress-label" id="dl-all-status-text">Mempersiapkan...</span>
+          <span class="dl-all-progress-counter" id="dl-all-counter">0 / 0</span>
+        </div>
+        <div class="dl-all-bar-wrap">
+          <div class="dl-all-bar-fill" id="dl-all-bar"></div>
+        </div>
+        <div class="dl-all-video-name" id="dl-all-video-name"></div>
+      </div>
     </div>
 
     <!-- ===== CARD: DOWNLOAD BY URL ===== -->
@@ -773,7 +847,7 @@
   let lastUrl = '';
   let currentPreviewData = null;
   let selectedFormat = 'mp4';
-  let currentSearchResults = []; // Global array untuk Batch Downloader
+  let searchResults = []; // simpan semua hasil pencarian
 
   /* ===== CLEAR BUTTON LOGIC ===== */
   function toggleClear(inputId, clearBtnId) {
@@ -979,14 +1053,25 @@
     const status = document.getElementById('search-status');
     const resEl = document.getElementById('results');
     const loadingEl = document.getElementById('search-loading');
+    const dlAllBtn = document.getElementById('btn-download-all');
+    const dlAllProgress = document.getElementById('dl-all-progress');
 
-    // Mulai loading state
+    // Reset
     btn.disabled = true;
     btn.textContent = 'Mencari...';
     resEl.innerHTML = '';
     status.textContent = '';
     status.className = 'status-txt';
-    loadingEl.classList.add('active'); // Tampilkan spinner
+    loadingEl.classList.add('active');
+    dlAllBtn.style.display = 'none';
+    dlAllProgress.classList.remove('active');
+    searchResults = [];
+
+    // Reset progress panel
+    document.getElementById('dl-all-bar').style.width = '0%';
+    document.getElementById('dl-all-counter').textContent = '0 / 0';
+    document.getElementById('dl-all-status-text').textContent = 'Mempersiapkan...';
+    document.getElementById('dl-all-video-name').textContent = '';
 
     try {
       const resp = await fetch('/api/search', {
@@ -1001,15 +1086,10 @@
       if (data.status !== 'success') throw new Error(data.msg);
 
       const videos = data.videos || [];
+      searchResults = videos; // simpan untuk download all
+
       status.textContent = videos.length > 0 ? `${videos.length} video TikTok ditemukan` : 'Tidak ada hasil untuk kata kunci ini.';
       status.className = videos.length > 0 ? 'status-txt ok' : 'status-txt';
-
-      // Populate global batch array & toggle tombol Download All
-      currentSearchResults = videos.map(v => ({
-        url: '/api/get_video?url=' + encodeURIComponent(resSelected['Search'] === 'HYPE v1.3' ? v.hdplay : v.play) + '&title=' + encodeURIComponent(v.title),
-        title: v.title
-      }));
-      document.getElementById('batch-wrapper').style.display = videos.length > 0 ? 'block' : 'none';
 
       videos.forEach(v => {
         const d = document.createElement('div'); d.className = 'video-item';
@@ -1024,29 +1104,87 @@
           </div>`;
         resEl.appendChild(d);
       });
+
+      // Tampilkan tombol Download All kalau ada hasil
+      if (videos.length > 0) {
+        dlAllBtn.style.display = 'block';
+        document.getElementById('btn-download-all-label').textContent = `⬇ Download Semua (${videos.length} Video)`;
+      }
     } catch(e) {
       status.textContent = 'Error: ' + e.message;
       status.className = 'status-txt err';
-      // Reset batch array & sembunyikan tombol jika error
-      currentSearchResults = [];
-      document.getElementById('batch-wrapper').style.display = 'none';
     } finally {
-      // Selalu sembunyikan spinner di akhir
       loadingEl.classList.remove('active');
       btn.disabled = false;
       btn.textContent = 'Cari Sekarang';
     }
   }
 
-  /* ===== BATCH DOWNLOAD — ANTI-POPUP BLOCKER (setTimeout 600ms Queue) ===== */
-  function triggerDownloadAll() {
-    if (!currentSearchResults || currentSearchResults.length === 0) return;
-    // Antrean berurutan: setiap video dijeda 600ms agar browser tidak blokir sebagai spam
-    currentSearchResults.forEach((video, index) => {
-      setTimeout(() => {
-        handleRealDownload(video.url, video.title);
-      }, index * 600);
-    });
+  /* ===== DOWNLOAD ALL ===== */
+  async function downloadAll() {
+    if (searchResults.length === 0) return;
+    const btn = document.getElementById('btn-download-all');
+    const progress = document.getElementById('dl-all-progress');
+    const bar = document.getElementById('dl-all-bar');
+    const counter = document.getElementById('dl-all-counter');
+    const statusText = document.getElementById('dl-all-status-text');
+    const videoName = document.getElementById('dl-all-video-name');
+    const label = document.getElementById('btn-download-all-label');
+    const total = searchResults.length;
+
+    btn.disabled = true;
+    btn.classList.add('downloading');
+    label.textContent = `⏳ Sedang Download...`;
+    progress.classList.add('active');
+    bar.style.width = '0%';
+    counter.textContent = `0 / ${total}`;
+    statusText.textContent = 'Memulai download semua video...';
+    videoName.textContent = '';
+
+    let successCount = 0;
+
+    for (let i = 0; i < total; i++) {
+      const v = searchResults[i];
+      const videoUrl = resSelected['Search'] === 'HYPE v1.3' ? v.hdplay : v.play;
+      const dlUrl = `/api/get_video?url=${encodeURIComponent(videoUrl)}&title=${encodeURIComponent(v.title)}`;
+      const shortTitle = v.title.length > 50 ? v.title.slice(0, 50) + '…' : v.title;
+
+      // Update UI
+      const percent = Math.round((i / total) * 100);
+      bar.style.width = percent + '%';
+      counter.textContent = `${i + 1} / ${total}`;
+      statusText.textContent = `⬇ Mengunduh video ${i + 1} dari ${total}`;
+      videoName.textContent = shortTitle;
+
+      await new Promise(resolve => {
+        const a = document.createElement('a');
+        a.href = dlUrl;
+        a.target = '_blank';
+        a.download = `[SVETIKTOK].${v.title.replace(/[^a-z0-9]/gi, '_').toLowerCase().slice(0, 60)}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        successCount++;
+        setTimeout(resolve, 900);
+      });
+    }
+
+    // Selesai
+    bar.style.width = '100%';
+    bar.style.background = 'var(--success)';
+    counter.textContent = `${successCount} / ${total}`;
+    statusText.textContent = `✅ Semua ${successCount} video berhasil diunduh!`;
+    videoName.textContent = '';
+
+    btn.disabled = false;
+    btn.classList.remove('downloading');
+    label.textContent = `⬇ Download Semua (${total} Video)`;
+
+    setTimeout(() => {
+      progress.classList.remove('active');
+      bar.style.background = '';
+      bar.style.width = '0%';
+    }, 5000);
   }
 
   /* ===== DOWNLOAD URL ===== */
